@@ -1,0 +1,34 @@
+name: YouTube Auto Uploader
+
+on:
+  schedule:
+    - cron: '0 10 * * *' # Har kuni soat 15:00 da (O'zbekiston vaqti bilan) avtomatik ishlaydi
+  workflow_dispatch: # Qo'lda ishga tushirish tugmasi
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Kodni ko'chirish
+      uses: actions/checkout@v3
+
+    - name: Python muhitini sozlash
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Kutubxonalarni o'rnatish
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Skriptni ishga tushirish va videoni yuklash
+      env:
+        YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+        YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+        YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        CHANNEL_NICHE: ${{ vars.CHANNEL_NICHE }}
+      run: |
+        python src/main.py
